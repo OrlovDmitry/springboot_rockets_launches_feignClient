@@ -13,19 +13,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
 @RestController
-public class RocketLaunchController {
+@RequestMapping("/rockets")
+public class RocketController {
 
     @Autowired
     private RocketServiceImpl rocketServiceImpl;
-
-    @Autowired
-    private LaunchServiceImpl launchServiceImpl;
 
     @Autowired
     private RocketLaunchProxy proxy;
@@ -33,7 +32,7 @@ public class RocketLaunchController {
     private Logger logger = LoggerFactory.getLogger (this.getClass ());
 
     // получение списка ID ракет
-        @GetMapping("/rockets")
+    @GetMapping("")
     public List<RocketIdResponseDto> getRocketIdList(){
         ResponseEntity<RocketIdResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
                 "https://api.spacexdata.com/v3/rockets", RocketIdResponseDto[].class);
@@ -41,7 +40,7 @@ public class RocketLaunchController {
         List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
         return response;
     }
-    @GetMapping("/rocketsFeign")
+    @GetMapping("/Feign")
     public List<RocketIdResponseDto> getRocketIdListFeign(){
         List<RocketIdResponseDto> response = proxy.getRocketIdList ();
         List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
@@ -49,18 +48,7 @@ public class RocketLaunchController {
     }
 
     // получение полей по конкретному ID ракеты
-    @GetMapping("/launches/rocketId/{rocketId}")
-    public List<LaunchesByRocketIdResponseDto> getLauncheByRocketIdList(@PathVariable String rocketId) throws NoSuchRocketException {
-        ResponseEntity<LaunchesResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
-                "https://api.spacexdata.com/v3/launches", LaunchesResponseDto[].class);
-        List<LaunchesResponseDto> response = Arrays.asList(responseEntity.getBody ());
-        List<LaunchesByRocketIdResponseDto> result = launchServiceImpl.filterLaunchesById (response,rocketId);  // фильтр для ответа
-        if (result.isEmpty ()){
-            throw new NoSuchRocketException ();
-        }
-        launchServiceImpl.saveToDB(result, rocketId);   // сохранение в БД
-        return result;
-    }
+
 
 //    @GetMapping("/launches")
 //    public LaunchesResponseDto[] getLaunchesList(){
