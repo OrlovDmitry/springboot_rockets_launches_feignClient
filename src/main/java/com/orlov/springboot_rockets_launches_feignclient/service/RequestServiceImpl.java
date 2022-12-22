@@ -1,4 +1,4 @@
-package com.orlov.springboot_rockets_launches_feignclient.serviceImpl;
+package com.orlov.springboot_rockets_launches_feignclient.service;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.LaunchesByRocketId;
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.Request;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class RequestServiceImpl {
+public class RequestServiceImpl implements RequestService {
 
     @Autowired
     RequestsRepository requestsRepository;

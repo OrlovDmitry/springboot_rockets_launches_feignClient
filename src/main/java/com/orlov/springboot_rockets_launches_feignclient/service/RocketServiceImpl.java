@@ -1,4 +1,4 @@
-package com.orlov.springboot_rockets_launches_feignclient.serviceImpl;
+package com.orlov.springboot_rockets_launches_feignclient.service;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.RocketId;
 import com.orlov.springboot_rockets_launches_feignclient.repository.RocketIdRepository;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class RocketServiceImpl {
+public class RocketServiceImpl implements RocketService{
 
     @Autowired
     RocketIdRepository rocketIdRepository;
@@ -22,7 +22,7 @@ public class RocketServiceImpl {
     public List<RocketId> addRocketsToRepo(List<RocketIdResponseDto> response){
         List<RocketId> rocketIds = new ArrayList<> ();
         for (RocketIdResponseDto res:response){
-            RocketId rocketId = new RocketId ();    // Пришлось создавать класс RocketId, чтобы включить в него id запроса и счётчик запросов.
+            RocketId rocketId = new RocketId ();    // Пришлось создавать класс RocketId, чтобы включить в него id запроса
             rocketId.setRocketId (res.getRocketId ());
             rocketIdRepository.save (rocketId);
             rocketIds.add (rocketId);

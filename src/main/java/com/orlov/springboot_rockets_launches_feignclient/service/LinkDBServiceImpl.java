@@ -1,4 +1,4 @@
-package com.orlov.springboot_rockets_launches_feignclient.serviceImpl;
+package com.orlov.springboot_rockets_launches_feignclient.service;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.LinkDB;
 import com.orlov.springboot_rockets_launches_feignclient.repository.LinkDBRepository;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LinkDBServiceImpl {
+public class LinkDBServiceImpl implements LinkDBService{
 
     @Autowired
     private LinkDBRepository linkDBRepository;

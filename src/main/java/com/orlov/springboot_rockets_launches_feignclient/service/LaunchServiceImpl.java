@@ -1,4 +1,4 @@
-package com.orlov.springboot_rockets_launches_feignclient.serviceImpl;
+package com.orlov.springboot_rockets_launches_feignclient.service;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.FlickrImage;
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.LaunchesByRocketId;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class LaunchServiceImpl {
+public class LaunchServiceImpl implements LaunchService {
 
     @Autowired
     private RequestServiceImpl requestServiceImpl;
@@ -39,15 +39,15 @@ public class LaunchServiceImpl {
     public void saveToDB(List<LaunchesByRocketIdResponseDto> result, String rocketId) {
         List<LaunchesByRocketId> launchesByRocketId = new ArrayList<> ();
         for (LaunchesByRocketIdResponseDto launch:result){      // проходимся по всему что получили по REST-запросу после фильтра
-            // сохраняем в БД объекты, начиная с самого нижнего уровня Flickr->LinkDB->LaunchByRicketId->Request
+            // сохраняем в БД объекты, начиная с самого нижнего уровня Flickr->LinkDB->LaunchByRocketId->Request
             List<FlickrImage> flickrImageList = flickrImageService.addFlickrImagesToRepo (launch);    // добавляем картинки
             LinkDB linkDB = linkDBService.createLinkDB (launch);    // создаем LinkDB
             linkDB.setFlickrImageList (flickrImageList);    // сетаем FlickrImage в LinkDB
             linkDBRepository.save (linkDB);     // сохраняем LinkDB в БД
-            var launchByRocketId = createLaunch (launch);   //создаем LaunchByRicketId
-            launchByRocketId.setLinkDB (linkDB);    // сетаем LinkDB в LaunchByRicketId
-            laucnhesByRocketIdRepository.save (launchByRocketId);   // сохраняем LaunchByRicketId в БД
-            launchesByRocketId.add (launchByRocketId);  // сохраняем LaunchByRicketId в List<LaunchByRicketId>
+            var launchByRocketId = createLaunch (launch);   //создаем LaunchByRocketId
+            launchByRocketId.setLinkDB (linkDB);    // сетаем LinkDB в LaunchByRocketId
+            laucnhesByRocketIdRepository.save (launchByRocketId);   // сохраняем LaunchByRocketId в БД
+            launchesByRocketId.add (launchByRocketId);  // сохраняем LaunchByRocketId в List<LaunchByRocketId>
         }
         requestServiceImpl.addToLaucnesRequestRepo (launchesByRocketId,rocketId);   // сохраняем Request в БД
     }
@@ -61,7 +61,7 @@ public class LaunchServiceImpl {
                 .collect(Collectors.toList());
     }
     // создание объекта LaunchesByRocketId, назначение полей
-    public static LaunchesByRocketId createLaunch(LaunchesByRocketIdResponseDto launch){
+    private LaunchesByRocketId createLaunch(LaunchesByRocketIdResponseDto launch){
         var launchesByRocketId = new LaunchesByRocketId ();
         launchesByRocketId.setLaunchYear (launch.getLaunchYear ());
         launchesByRocketId.setMissionName (launch.getMissionName ());

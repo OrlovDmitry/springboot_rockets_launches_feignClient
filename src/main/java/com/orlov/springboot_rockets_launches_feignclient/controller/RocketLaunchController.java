@@ -2,10 +2,11 @@ package com.orlov.springboot_rockets_launches_feignclient.controller;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.*;
 import com.orlov.springboot_rockets_launches_feignclient.exceptions.NoSuchRocketException;
+import com.orlov.springboot_rockets_launches_feignclient.proxy.RocketLaunchProxy;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesByRocketIdResponseDto;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesResponseDto;
 import com.orlov.springboot_rockets_launches_feignclient.response.RocketIdResponseDto;
-import com.orlov.springboot_rockets_launches_feignclient.serviceImpl.*;
+import com.orlov.springboot_rockets_launches_feignclient.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +27,23 @@ public class RocketLaunchController {
     @Autowired
     private LaunchServiceImpl launchServiceImpl;
 
+    @Autowired
+    private RocketLaunchProxy proxy;
+
     private Logger logger = LoggerFactory.getLogger (this.getClass ());
 
     // получение списка ID ракет
-    @GetMapping("/rockets")
+        @GetMapping("/rockets")
     public List<RocketIdResponseDto> getRocketIdList(){
         ResponseEntity<RocketIdResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
                 "https://api.spacexdata.com/v3/rockets", RocketIdResponseDto[].class);
         List<RocketIdResponseDto> response = Arrays.asList (responseEntity.getBody ());
+        List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
+        return response;
+    }
+    @GetMapping("/rocketsFeign")
+    public List<RocketIdResponseDto> getRocketIdListFeign(){
+        List<RocketIdResponseDto> response = proxy.getRocketIdList ();
         List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
         return response;
     }

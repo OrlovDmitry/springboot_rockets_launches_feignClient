@@ -15,8 +15,5 @@ public class FlickrImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="flickr_image_id")
-    private Integer flickrImageId;
-
     private String flickr_image;
 }

@@ -1,4 +1,4 @@
-package com.orlov.springboot_rockets_launches_feignclient.serviceImpl;
+package com.orlov.springboot_rockets_launches_feignclient.service;
 
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.FlickrImage;
 import com.orlov.springboot_rockets_launches_feignclient.repository.FlickrImagesRepository;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class FlickrImageServiceImpl {
+public class FlickrImageServiceImpl implements FlickrImageService {
 
     @Autowired
     FlickrImagesRepository flickrImagesRepository;
@@ -18,7 +18,7 @@ public class FlickrImageServiceImpl {
     // создание списка FlickrImage для каждого объекта LinkDB, назначение полей, сохранение в БД
     public List<FlickrImage> addFlickrImagesToRepo(LaunchesByRocketIdResponseDto launch){
         List<FlickrImage> flickrImageList = new ArrayList<FlickrImage> ();
-        if (launch.getLinks ().getFlickr_images ()!=null) {   // если объекты FlickrImage имеются...
+        if (!launch.getLinks ().getFlickr_images ().isEmpty ()) {   // если объекты FlickrImage имеются...
             for (String image : launch.getLinks ().getFlickr_images ()) {
                 FlickrImage flickrImage = new FlickrImage ();
                 flickrImage.setFlickr_image (image);
@@ -26,7 +26,7 @@ public class FlickrImageServiceImpl {
                 flickrImagesRepository.save (flickrImage);  // ...сохраняем их в БД
             }
 //        } else {
-//            flickrImagesRepository.save (null);  // если нет, сохраняем пустой объект
+//            flickrImagesRepository.save (new FlickrImage ());  // если нет, сохраняем пустой объект
         }
         return flickrImageList;
     }
