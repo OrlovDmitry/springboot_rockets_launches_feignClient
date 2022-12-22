@@ -1,5 +1,6 @@
 package com.orlov.springboot_rockets_launches_feignclient.service;
 
+import com.orlov.springboot_rockets_launches_feignclient.exceptions.NoSuchRocketException;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesByRocketIdResponseDto;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesResponseDto;
 
@@ -10,4 +11,6 @@ public interface LaunchService {
     void saveToDB(List<LaunchesByRocketIdResponseDto> result, String rocketId);
 
     List<LaunchesByRocketIdResponseDto> filterLaunchesById(List<LaunchesResponseDto> response, String rocketId);
+
+    List<LaunchesByRocketIdResponseDto> getLaunchesByRocketIdList(String rocketId) throws NoSuchRocketException;
 }

@@ -3,7 +3,7 @@ package com.orlov.springboot_rockets_launches_feignclient.controller;
 import com.orlov.springboot_rockets_launches_feignclient.exceptions.NoSuchRocketException;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesByRocketIdResponseDto;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesResponseDto;
-import com.orlov.springboot_rockets_launches_feignclient.service.LaunchServiceImpl;
+import com.orlov.springboot_rockets_launches_feignclient.service.LaunchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,18 +20,10 @@ import java.util.List;
 public class LaunchController {
 
     @Autowired
-    private LaunchServiceImpl launchServiceImpl;
+    private LaunchService launchService;
 
     @GetMapping("/{rocketId}")
-    public List<LaunchesByRocketIdResponseDto> getLauncheByRocketIdList(@PathVariable String rocketId) throws NoSuchRocketException {
-        ResponseEntity<LaunchesResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
-                "https://api.spacexdata.com/v3/launches", LaunchesResponseDto[].class);
-        List<LaunchesResponseDto> response = Arrays.asList(responseEntity.getBody ());
-        List<LaunchesByRocketIdResponseDto> result = launchServiceImpl.filterLaunchesById (response,rocketId);  // фильтр для ответа
-        if (result.isEmpty ()){
-            throw new NoSuchRocketException ();
-        }
-        launchServiceImpl.saveToDB(result, rocketId);   // сохранение в БД
-        return result;
+    public List<LaunchesByRocketIdResponseDto> getLaunchesByRocketIdList(@PathVariable String rocketId) throws NoSuchRocketException {
+        return launchService.getLaunchesByRocketIdList (rocketId);
     }
 }

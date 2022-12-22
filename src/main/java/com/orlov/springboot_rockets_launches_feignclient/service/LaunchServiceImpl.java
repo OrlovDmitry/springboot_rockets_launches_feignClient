@@ -3,15 +3,19 @@ package com.orlov.springboot_rockets_launches_feignclient.service;
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.FlickrImage;
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.LaunchesByRocketId;
 import com.orlov.springboot_rockets_launches_feignclient.entityRepo.LinkDB;
+import com.orlov.springboot_rockets_launches_feignclient.exceptions.NoSuchRocketException;
 import com.orlov.springboot_rockets_launches_feignclient.repository.FlickrImagesRepository;
 import com.orlov.springboot_rockets_launches_feignclient.repository.LaucnhesByRocketIdRepository;
 import com.orlov.springboot_rockets_launches_feignclient.repository.LinkDBRepository;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesByRocketIdResponseDto;
 import com.orlov.springboot_rockets_launches_feignclient.response.LaunchesResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,19 @@ public class LaunchServiceImpl implements LaunchService {
 
     @Autowired
     FlickrImagesRepository flickrImagesRepository;
+
+    @Override
+    public List<LaunchesByRocketIdResponseDto> getLaunchesByRocketIdList(String rocketId) throws NoSuchRocketException {
+        ResponseEntity<LaunchesResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
+                "https://api.spacexdata.com/v3/launches", LaunchesResponseDto[].class);
+        List<LaunchesResponseDto> response = Arrays.asList(responseEntity.getBody ());
+        List<LaunchesByRocketIdResponseDto> result = filterLaunchesById (response,rocketId);  // фильтр для ответа
+        if (result.isEmpty ()){
+            throw new NoSuchRocketException ();
+        }
+        saveToDB(result, rocketId);   // сохранение в БД
+        return result;
+    }
 
     public void saveToDB(List<LaunchesByRocketIdResponseDto> result, String rocketId) {
         List<LaunchesByRocketId> launchesByRocketId = new ArrayList<> ();
@@ -60,6 +77,7 @@ public class LaunchServiceImpl implements LaunchService {
                 })
                 .collect(Collectors.toList());
     }
+
     // создание объекта LaunchesByRocketId, назначение полей
     private LaunchesByRocketId createLaunch(LaunchesByRocketIdResponseDto launch){
         var launchesByRocketId = new LaunchesByRocketId ();

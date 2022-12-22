@@ -27,24 +27,18 @@ public class RocketController {
     private RocketServiceImpl rocketServiceImpl;
 
     @Autowired
-    private RocketLaunchProxy proxy;
+    private RocketService rocketService;
 
     private Logger logger = LoggerFactory.getLogger (this.getClass ());
 
     // получение списка ID ракет
     @GetMapping("")
     public List<RocketIdResponseDto> getRocketIdList(){
-        ResponseEntity<RocketIdResponseDto[]> responseEntity = new RestTemplate ().getForEntity (
-                "https://api.spacexdata.com/v3/rockets", RocketIdResponseDto[].class);
-        List<RocketIdResponseDto> response = Arrays.asList (responseEntity.getBody ());
-        List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
-        return response;
+        return rocketService.getRocketIdList();
     }
     @GetMapping("/Feign")
     public List<RocketIdResponseDto> getRocketIdListFeign(){
-        List<RocketIdResponseDto> response = proxy.getRocketIdList ();
-        List<RocketId> rocketIds = rocketServiceImpl.addRocketsToRepo (response);   // сохранение списка ID ракет в БД
-        return response;
+        return rocketService.getRocketIdListFeign();
     }
 
     // получение полей по конкретному ID ракеты
